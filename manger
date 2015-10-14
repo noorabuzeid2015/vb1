@@ -1,0 +1,151 @@
+Imports System
+Imports System.Data
+Imports System.Data.SqlClient
+Imports System.Web
+
+Public Class managerdata
+
+    Public connectionString
+    Public FetchSubRows
+
+
+    Sub New()
+
+        connectionString = ConfigurationManager.ConnectionStrings("MyConn").ConnectionString
+        FetchSubRows = New SqlConnection(connectionString)
+    End Sub
+
+    ' funcation fill gried view  
+    Public Function fill_gridview() As DataTable
+
+        Dim comand As String = "SELECT product.id,product.name,product.code,product.unit,category.name as CategoryName FROM product INNER JOIN category ON product.id_c  =  category.id"
+
+
+
+        Dim scomand As New SqlCommand(comand, FetchSubRows)
+        Dim datareder As SqlDataReader
+        Dim datatable As New DataTable
+
+
+        FetchSubRows.Open()
+        datareder = scomand.ExecuteReader
+        datatable.Load(datareder)
+        FetchSubRows.Close()
+        Return datatable
+
+    End Function
+
+
+    '///////////
+    ' Begin code of funcation insert product 
+    Public Function insertproduct(ByVal name As String, ByVal code As String, ByVal unit As String, ByVal idc As Integer) As Boolean
+
+        Dim comand As String = "INSERT INTO product (name,code,unit,id_c)VALUES(@name,@code,@unite,@idc)"
+        Dim scomand As New SqlCommand(comand, FetchSubRows)
+
+        scomand.Parameters.AddWithValue("@name", name)
+        scomand.Parameters.AddWithValue("@code", code)
+        scomand.Parameters.AddWithValue("@unite", unit)
+        scomand.Parameters.AddWithValue("@idc", idc)
+        Try
+            FetchSubRows.Open()
+            scomand.ExecuteNonQuery()
+            FetchSubRows.close()
+            Return True
+
+        Catch ex As Exception
+
+            Return False
+        End Try
+    End Function
+
+    'End of function insert product 
+
+    Public Function updateproduct(ByVal name As String, ByVal code As String, ByVal unit As String, ByVal idc As Integer, ByVal id As String) As Boolean
+
+        Dim comand As String = "UPDATE product SET name=@name,code=@code,unit=@unite,id_c=@idc WHERE id='" + id + "'"
+
+
+        Dim scomand As New SqlCommand(comand, FetchSubRows)
+
+        scomand.Parameters.AddWithValue("@name", name)
+        scomand.Parameters.AddWithValue("@code", code)
+        scomand.Parameters.AddWithValue("@unite", unit)
+        scomand.Parameters.AddWithValue("@idc", idc)
+
+
+        Try
+            FetchSubRows.Open()
+            scomand.ExecuteNonQuery()
+            FetchSubRows.close()
+            Return True
+
+        Catch ex As Exception
+
+            Return False
+        End Try
+
+    End Function
+
+    Public Function deleteproduct(ByVal id As String)
+
+        Dim comand As String = "delete FROM product where id= '" + id + "'"
+        Dim scomand As New SqlCommand(comand, FetchSubRows)
+
+        Try
+            FetchSubRows.Open()
+            scomand.ExecuteNonQuery()
+            FetchSubRows.close()
+            Return True
+        Catch ex As Exception
+            Return False
+        End Try
+
+    End Function
+
+
+
+
+    Public Function insertcategory(ByVal name As String) As Boolean
+
+        Dim comand As String = "INSERT INTO category (name)VALUES(@name)"
+        Dim scomand As New SqlCommand(comand, FetchSubRows)
+
+        scomand.Parameters.AddWithValue("@name", name)
+
+        Try
+            FetchSubRows.Open()
+            scomand.ExecuteNonQuery()
+            FetchSubRows.close()
+            Return True
+
+        Catch ex As Exception
+
+            Return False
+        End Try
+    End Function
+    Public Function fill_dropdawonlist() As DataTable
+
+        Dim connectionString
+        connectionString = ConfigurationManager.ConnectionStrings("MyConn").ConnectionString
+        Dim FetchSubRows As New SqlConnection(connectionString)
+        Dim comand As String = "SELECT * FROM category "
+
+
+
+
+
+        Dim scomand As New SqlCommand(comand, FetchSubRows)
+        Dim datareder As SqlDataReader
+        Dim datatable As New DataTable
+
+
+        FetchSubRows.Open()
+        datareder = scomand.ExecuteReader
+        datatable.Load(datareder)
+        FetchSubRows.Close()
+        Return datatable
+
+    End Function
+
+End Class
